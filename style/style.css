@@ -125,6 +125,15 @@ form {
     cursor: pointer;
     font-size: 24px;
     border-radius: 3px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.wrapper .btn:hover {
+    background-color: #8CEC7F; 
+}
+
+.wrapper .btn:active {
+    background-color: #286E1F;
 }
 
 .wrapper .reg {
