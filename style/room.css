@@ -1,0 +1,252 @@
+@font-face {
+    font-family:'Minecraft' ;
+    src: url(../fonts/minecraft.ttf);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:'Minecraft';
+}
+
+body{
+    min-height: 100vh;
+    background: url(../backimg/start.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.wrapper{
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.room_box{
+    
+    background-color: rgba(30, 30, 30, 0.8) ;
+    width: 50%;
+    min-height: 100vh;
+    float: left;
+}
+
+.room_box p {
+    font-size: 1.5vw; 
+}
+
+@media (max-width: 1356px) {
+    .room_box p {
+        font-size: 1.5vw;
+    }
+}
+
+.mage{
+    width: 100%; 
+}
+
+.room{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex-direction: row;
+    margin-top: 30px;
+    padding: 10px 10px;
+}
+
+.room p{
+    margin: 0;
+}
+
+.come_in{
+    font-size: 1.5vw ;
+    cursor: pointer;
+    width: 120px;
+    height: 37px;
+    color: white;
+    background-color:#232323;
+    border: #000000;
+    border-radius: 3%;
+}
+
+.come_in:hover{
+    background-color: #51E03F;
+}
+
+.choose-char{
+    margin: 0px 100px;
+    max-width: 70vh;
+}
+
+@media (max-width: 1356px) {
+    .choose-char{
+        max-width: 40vh;
+    }
+} 
+
+.title{
+    margin-bottom: 2.3vh;
+}
+
+.choose{
+    width: 70vh;
+    max-height: 100%;
+    padding: 2vh;
+    background-color: rgba(30, 30, 30, 0.8) ;
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+}
+
+@media (max-width: 1356px) {
+    .choose{
+        max-width: 40vh;
+    }
+}
+
+.char{ 
+    display: flex;
+    flex-direction: row;
+}
+
+.picked-char-icon{
+    background-image: url(../char_icons/1.png);
+    margin: 2vh;
+    border-radius: 16px;
+    width: 21vh;
+    height: 21vh;
+    background-size: cover;
+    background-position: center;
+} 
+
+@media (max-width: 1356px) {
+    .picked-char-icon{
+        max-width: 10vh;
+        max-height: 10vh;
+    }
+}
+
+.char-info{
+    margin: 2vh;
+    max-width: 35vh;
+}
+
+@media (max-width: 1356px) {
+    .char-info{
+        max-width: 15vh; 
+        font-size: 0.8vw;
+    }
+}
+
+.name{
+    line-height: 1.4;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 1356px) {
+    .name{
+        font-size: 1.3vw;
+    }
+}
+
+.info{
+    max-height: 12vh;
+    line-height: 1.3;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.analog-info{ 
+    visibility: hidden;
+    position: absolute;
+    left: -999em;
+}
+
+@media (max-width: 1356px) {
+    .info{
+        visibility: hidden;
+        position: absolute;
+        left: -999em;
+    }
+}
+
+@media (max-width: 1356px) {
+    .analog-info{
+        font-size: 1.1vw;
+        overflow-y: auto;
+        max-height: 12vh;
+        padding:0 10px;
+        position: static;
+        visibility: visible;
+    }
+}
+
+.pick {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+
+
+ .pick div{
+    border-radius: 16px;
+    cursor: pointer;
+    background-color:#252525 ;
+    width: 18vh;
+    height: 18vh; 
+    display: flex;
+    margin: 2vh;
+    flex-direction: row;
+    flex-wrap: wrap ;
+ }
+
+ @media (max-width: 1356px) {
+    .pick div{
+        max-width: 7vh;
+        max-height: 7vh;
+    }
+}
+
+ .char-icon1{
+    background-image:url(../char_icons/1.png);
+    background-size: cover;
+    background-position: center;
+ }
+    
+ .char-icon2{
+    background-image:url(../char_icons/4.png);
+    background-size: cover;
+    background-position: center;
+ }
+
+ .char-icon4{
+    background-image:url(../char_icons/2.png);
+    background-size: cover;
+    background-position: center;
+ }
+
+ .char-icon5{
+    background-image:url(../char_icons/3.png);
+    background-size: cover;
+    background-position: center;
+ }
+ 
+
+ .rules{
+    cursor: pointer;
+    margin-top: 2.3vh;
+ }
+
+ .rules a{
+    text-decoration: none;
+    color: white;
+ }
+
+ .rules a:hover{
+    color: #FFE629;
+ }
+

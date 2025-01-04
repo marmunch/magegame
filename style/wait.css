@@ -65,6 +65,33 @@ li::marker{
     font-size: 0.8rem;
     line-height: 0.6;
 }
+ 
+.button{
+    width: 100%;
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+} 
+
+.invite{
+    display:block;
+    margin-top: 0 auto;
+    color: white;
+    width: 187px;
+    height: 59px;
+    background:#51E03F;
+    border: none;
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
+    cursor: pointer;
+    font-size: 24px;
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+.invite:hover{
+    background-color: #8CEC7F;
+}
 
 .btn { 
     display:block;
@@ -75,7 +102,7 @@ li::marker{
     background:var(--btn-bg-color, #51E03F);
     border: none;
     outline: none;
-    box-shadow: 0 0 10px rgb(0, 0, 0, .1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .1);
     cursor: pointer;
     font-size: 24px;
     border-radius: 3px;
@@ -84,6 +111,87 @@ li::marker{
 
 .btn:hover {
     background-color: var(--btn-hover-bg-color, #8CEC7F); 
+}
+
+.popup {
+    display: none; 
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    background-color:rgb(48, 48, 48);
+    margin: 7% auto;
+    padding: 20px;
+    width: 50%;
+    height: 60%;
+    position: relative;
+    
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color:#FFE629;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.popup-title {
+    line-height: 1.12;
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+
+}
+
+.nick {
+    width: 60%;
+    padding: 10px;
+    margin-bottom: 20px;
+    background: transparent;
+    border: none;
+    outline: none;
+    border: 2px solid white; 
+    border-radius: 16px;
+    font-size: 16px;
+    color: white;
+}
+
+.send {
+    width: 187px;
+    height: 59px;
+    padding: 10px;
+    font-size: 24px;
+    background-color: #51E03F;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    
+    cursor: pointer;
+}
+
+.send:hover {
+    background-color: #8CEC7F;
 }
 
 
