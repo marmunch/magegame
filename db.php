@@ -1,12 +1,11 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "mydatabase";
+$host = 'pg';
+$db = 'studs';
+$user = 's333884';
+$password = 'ig7dPUHXho4OLIJo';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
+$dsn = "pgsql:host=$host;port=5432;dbname=$db;";
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+$pdo = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
 ?>
