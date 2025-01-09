@@ -3,26 +3,26 @@ session_start();
 include 'db.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['username']) && isset($_POST['password'])) {
-        $username = $_POST['username'];
+    if (isset($_POST['login']) && isset($_POST['password'])) {
+        $login = $_POST['login'];
         $password = $_POST['password'];
 
-        $sql = "SELECT * FROM users WHERE username='$username'";
+        $sql = "SELECT * FROM Users WHERE login='$login'";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
             $row = $result->fetch_assoc();
             if (password_verify($password, $row['password'])) {
-                
-                $_SESSION['username'] = $username;
+                $_SESSION['login'] = $login;
                 $_SESSION['logged_in'] = true;
 
                 
-                $token = bin2hex(random_bytes(16)); 
+                setcookie('login', $login, time() + (86400 * 30), "/");
+
+                $token = bin2hex(random_bytes(16));
                 setcookie('auth_token', $token, time() + (86400 * 30), "/");
 
-                
-                $sql = "UPDATE users SET auth_token='$token' WHERE username='$username'";
+                $sql = "UPDATE Users SET auth_token='$token' WHERE login='$login'";
                 $conn->query($sql);
 
                 echo "Вход успешен!";
