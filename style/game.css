@@ -104,7 +104,10 @@ body{
 .icon{
     width: 100px;
     height: 100px;
-    background-color: black;
+    
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
 .center{
@@ -125,11 +128,13 @@ body{
     align-items: center;
 }
 
-.card{
+.cards div{
     margin: 15px;
     width: 200px;
     height: 300px;
-    background-color: brown;
+    
+background-size: cover;
+background-position: center;
 }
 
 .player2, .player3 {
@@ -164,7 +169,11 @@ body{
     width: 120px;
     height: 120px;
     background-color: black;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
+
 
 .cards-effect{
     display: flex;
@@ -184,7 +193,16 @@ body{
   width: 100px;
   height: 150px;
   margin: 10px;
-  background-color: brown;
+  
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+}
+
+.mycard:hover{
+    width: 120px;
+    height:180px ;
+    margin-top: -30px;
 }
 
 .effect{
@@ -221,4 +239,10 @@ body{
     width: 120px;
     height: 120px;
     background-color: #525252;
+}
+
+.lives, .tokens {
+    margin: 5px 0;
+    font-size: 18px;
+    color: white;
 }

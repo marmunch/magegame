@@ -25,7 +25,7 @@ body{
 }
 
 .room_box{
-    
+    position: relative;
     background-color: rgba(30, 30, 30, 0.8) ;
     width: 50%;
     min-height: 100vh;
@@ -72,6 +72,31 @@ body{
 
 .come_in:hover{
     background-color: #51E03F;
+}
+
+.create {
+    position: absolute;
+    bottom: 15px;
+    right: 50px;
+    color: white;
+    width: 187px;
+    height: 59px;
+    background: #51E03F;
+    border: none;
+    outline: none;
+    box-shadow: 0 0 10px rgb(0, 0, 0, .1);
+    cursor: pointer;
+    font-size: 24px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease-in-out;
+} 
+
+.create:hover {
+    background-color: #8CEC7F; 
+}
+
+.create:active {
+    background-color: #286E1F;
 }
 
 .choose-char{
@@ -250,3 +275,71 @@ body{
     color: #FFE629;
  }
 
+ .invite-box{
+    position: absolute;
+    
+    right: 20px;
+    bottom: 20px;
+    background-color: #303030;
+    width: 300px;
+    
+ }
+
+
+
+ .invite-box-content{
+    padding: 10px 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+
+    position: relative;
+    font-size: medium;
+
+ }
+
+ .close-btn{
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    font-size: large;
+    cursor: pointer;
+ }
+
+ .close-btn:hover{
+    color: #FFE629;
+ }
+
+ .btns{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+ }
+
+ .btns button{
+    width: 120px;
+    height: 40px;
+    font-size: x-large;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+ }
+
+ .yes{
+    background-color: #51E03F;
+ }
+
+ .yes:hover{
+    background-color:#8CEC7F;
+ }
+
+ .no{
+    background-color: #E42828;
+ }
+
+ .no:hover{
+    background-color: #F19393;
+ }

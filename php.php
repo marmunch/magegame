@@ -8,10 +8,12 @@ if (!isset($_COOKIE['auth_token'])) {
 }
 
 $token = $_COOKIE['auth_token'];
-$sql = "SELECT * FROM users WHERE auth_token='$token'";
-$result = $conn->query($sql);
+$stmt = $conn->prepare("SELECT * FROM users WHERE auth_token = :token");
+$stmt->bindParam(':token', $token);
+$stmt->execute();
+$result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if ($result->num_rows == 0) {
+if (!$result) {
     header("Location: login.html");
     exit();
 }

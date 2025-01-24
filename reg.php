@@ -7,17 +7,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $login = $_POST['login'];
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-        $sql = "SELECT * FROM Users WHERE login='$login'";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare("SELECT * FROM users WHERE login = :login");
+        $stmt->bindParam(':login', $login);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result->num_rows > 0) {
+        if ($result) {
             echo '<span style="color: red;">&times; такой пользователь уже существует</span>';
         } else {
-            $sql = "INSERT INTO Users (login, password) VALUES ('$login', '$password')";
-            if ($conn->query($sql) === TRUE) {
+            $stmt = $conn->prepare("INSERT INTO users (login, password) VALUES (:login, :password)");
+            $stmt->bindParam(':login', $login);
+            $stmt->bindParam(':password', $password);
+            if ($stmt->execute()) {
                 echo "Регистрация успешна!";
             } else {
-                echo "Ошибка: " . $sql . "<br>" . $conn->error;
+                echo "Ошибка: " . $stmt->errorInfo()[2];
             }
         }
     } else {

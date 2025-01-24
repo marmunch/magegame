@@ -1,11 +1,13 @@
 <?php
-$host = 'pg';
-$db = 'studs';
-$user = 's333884';
-$password = 'ig7dPUHXho4OLIJo';
+$host = "localhost";
+$dbname = "mydatabase";
+$username = "admin";
+$password = "1";
 
-$dsn = "pgsql:host=$host;port=5432;dbname=$db;";
-
-$pdo = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
-
+try {
+    $conn = new PDO("pgsql:host=$host;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
 ?>

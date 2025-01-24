@@ -7,23 +7,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $login = $_POST['login'];
         $password = $_POST['password'];
 
-        $sql = "SELECT * FROM Users WHERE login='$login'";
-        $result = $conn->query($sql);
+        $stmt = $conn->prepare("SELECT * FROM Users WHERE login = :login");
+        $stmt->bindParam(':login', $login);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            if (password_verify($password, $row['password'])) {
+        if ($result) {
+            if (password_verify($password, $result['password'])) {
                 $_SESSION['login'] = $login;
                 $_SESSION['logged_in'] = true;
 
-                
+               
                 setcookie('login', $login, time() + (86400 * 30), "/");
 
                 $token = bin2hex(random_bytes(16));
                 setcookie('auth_token', $token, time() + (86400 * 30), "/");
 
-                $sql = "UPDATE Users SET auth_token='$token' WHERE login='$login'";
-                $conn->query($sql);
+                $stmt = $conn->prepare("UPDATE Users SET auth_token = :token WHERE login = :login");
+                $stmt->bindParam(':token', $token);
+                $stmt->bindParam(':login', $login);
+                $stmt->execute();
 
                 echo "Вход успешен!";
             } else {

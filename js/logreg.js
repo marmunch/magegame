@@ -8,12 +8,16 @@ $(document).ready(function() {
             url: 'login.php',
             data: formData,
             success: function(response) {
-                console.log(response);
-                if (response === "Вход успешен!") {
+                console.log("Response from server:", response);
+                if (response.trim() === "Вход успешен!") {
                     window.location.href = "php.php";
                 } else {
                     $('#loginMessage').html(response);
                 }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                $('#loginMessage').html('Ошибка: ' + error);
             }
         });
     });
@@ -29,6 +33,10 @@ $(document).ready(function() {
             success: function(response) {
                 console.log(response);
                 $('#registerMessage').html(response);
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                $('#registerMessage').html('Ошибка: ' + error);
             }
         });
     });
