@@ -1,0 +1,199 @@
+CREATE TABLE Users (
+    login VARCHAR(100) NOT NULL,
+    password VARCHAR(100) NOT NULL,
+    character VARCHAR(100),
+    
+    PRIMARY KEY (login)
+);
+
+CREATE TABLE Cards (
+    id_card SERIAL,
+    cardtype INT NOT NULL,
+    lead INT NULL,
+    heal INT NOT NULL DEFAULT 0,
+    damage INT NOT NULL DEFAULT 0,
+    descr VARCHAR(100) NOT NULL,
+    
+    PRIMARY KEY (id_card)
+);
+
+CREATE TABLE Games (
+    id_game SERIAL,
+    status INT NOT NULL,
+    current_timee INT,
+    
+    PRIMARY KEY (id_game)
+);
+
+CREATE TABLE Players (
+    id_player SERIAL,
+    login VARCHAR(10) NOT NULL,
+    lives INT NOT NULL DEFAULT 20,
+    tokens INT NOT NULL DEFAULT 0,
+    id_game INT,
+    cards_chosen BOOLEAN NOT NULL DEFAULT FALSE,
+    is_alive BOOLEAN DEFAULT TRUE,
+    
+    PRIMARY KEY (id_player),
+    FOREIGN KEY (id_card) REFERENCES Cards (id_card) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (id_game) REFERENCES games (id_game) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Spells (
+    id_player INT,
+    id_card INT,
+    card_position INT,
+    
+    FOREIGN KEY (id_player) REFERENCES Players (id_player) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE Cards_in_hand (
+    id_player INT,
+    id_card INT,
+    
+    FOREIGN KEY (id_player) REFERENCES Players (id_player) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_card) REFERENCES Cards (id_card) ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+
+CREATE TABLE Chosen_cards (
+    id_player INT,
+    id_card INT,
+    
+    FOREIGN KEY (id_player) REFERENCES Players (id_player) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (id_card) REFERENCES Cards (id_card) ON DELETE CASCADE ON UPDATE CASCADE
+
+);
+
+
+/////////////////////////////////////////
+fulling cards table
+/////////////////////////////////////////
+
+-- Добавление карт с cardtype=1, lead=0
+INSERT INTO Cards (cardtype, lead, descr, damage, heal, png)
+VALUES
+	(0, 0, 'Пустая карта', 0, 0, 'images/card0.jpg'),
+    (1, 0, 'Накрути 2 жизни', 0, 2, 'images/card1.jpg'),
+	(1, 0, 'Накрути 2 жизни', 0, 2, 'images/card1.jpg'),
+	(1, 0, 'Накрути 3 жизни', 0, 3, 'images/card2.jpg'),
+	(1, 0, 'Накрути 3 жизни', 0, 3, 'images/card2.jpg'),
+	(1, 0, 'Накрути 1 жизнь', 0, 1, 'images/card3.jpg'),
+	(1, 0, 'Накрути 1 жизнь', 0, 1, 'images/card3.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card4.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card4.jpg'),
+	(1, 0, 'Враг отхватывает 1 урон', 1, 0, 'images/card5.jpg'),
+	(1, 0, 'Враг отхватывает 1 урон', 1, 0, 'images/card5.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card6.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card6.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card7.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card7.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card8.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card8.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card9.jpg'),
+	(1, 0, 'Враг отхватывает 3 урона', 3, 0, 'images/card9.jpg'),
+	(1, 0, 'Враг отхватывает 1 урон', 1, 0, 'images/card10.jpg'),
+	(1, 0, 'Враг отхватывает 1 урон', 1, 0, 'images/card10.jpg'),
+	(1, 0, 'Враг отхватывает 2 урона', 2, 0, 'images/card11.jpg'),
+	(1, 0, 'Враг отхватывает 2 урона', 2, 0, 'images/card11.jpg')
+	;
+
+//////////////////////////////////
+
+-- Добавление карт с cardtype=2, lead=0
+INSERT INTO Cards (cardtype, lead, descr, damage, heal, png)
+VALUES
+    (2, 0, 'Нанеси 2 урона', 2, 0, 'images/card12.jpg'),
+	(2, 0, 'Нанеси 2 урона', 2, 0, 'images/card12.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card13.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card13.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card14.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card14.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card15.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card15.jpg'),
+	(2, 0, 'Нанеси 3 урона', 3, 0, 'images/card16.jpg'),
+	(2, 0, 'Нанеси 3 урона', 3, 0, 'images/card16.jpg'),
+	(2, 0, 'Нанеси 3 урона', 3, 0, 'images/card16.jpg'),
+	(2, 0, 'Нанеси 3 урона', 3, 0, 'images/card17.jpg'),
+	(2, 0, 'Нанеси 3 урона', 3, 0, 'images/card17.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card18.jpg'),
+	(2, 0, 'Нанеси 1 урон', 1, 0, 'images/card18.jpg'),
+	(2, 0, 'Нанеси 2 урона', 2, 0, 'images/card19.jpg'),
+	(2, 0, 'Нанеси 2 урона', 2, 0, 'images/card19.jpg'),
+	(2, 0, 'Накрути 2 жизни', 0, 2, 'images/card20.jpg'),
+	(2, 0, 'Накрути 2 жизни', 0, 2, 'images/card20.jpg')
+	;
+
+//////////////////////////////////
+
+-- Добавление карт с cardtype=3, lead=0
+INSERT INTO Cards (cardtype, lead, descr, damage, heal, png)
+VALUES
+    (3, 1, 'Нанеси 2 урона', 2, 0, 'images/card21.jpg'),
+	(3, 1, 'Нанеси 2 урона', 2, 0, 'images/card21.jpg'),
+	(3, 2, 'Нанеси 3 урона', 3, 0, 'images/card22.jpg'),
+	(3, 2, 'Нанеси 3 урона', 3, 0, 'images/card22.jpg'),
+	(3, 14, 'Нанеси 2 урона', 2, 0, 'images/card23.jpg'),
+	(3, 14, 'Нанеси 2 урона', 2, 0, 'images/card23.jpg'),
+	(3, 12, 'Накрути 4 жизни', 0, 2, 'images/card24.jpg'),
+	(3, 12, 'Накрути 4 жизни', 0, 2, 'images/card24.jpg'),
+	(3, 17, 'Нанеси 3 урона', 3, 0, 'images/card25.jpg'),
+	(3, 17, 'Нанеси 3 урона', 3, 0, 'images/card25.jpg'),
+	(3, 13, 'Нанеси 3 урона', 3, 0, 'images/card26.jpg'),
+	(3, 13, 'Нанеси 3 урона', 3, 0, 'images/card26.jpg'),
+	(3, 19, 'Нанеси 1 урон', 1, 0, 'images/card27.jpg'),
+	(3, 19, 'Нанеси 1 урон', 1, 0, 'images/card27.jpg'),
+	(3, 15, 'Нанеси 3 урона', 3, 0, 'images/card28.jpg'),
+	(3, 15, 'Нанеси 3 урона', 3, 0, 'images/card28.jpg'),
+	(3, 9, 'Нанеси 2 урона', 2, 0, 'images/card29.jpg'),
+	(3, 9, 'Нанеси 2 урона', 2, 0, 'images/card29.jpg'),
+	(3, 10, 'Нанеси 5 урона', 5, 0, 'images/card30.jpg'),
+	(3, 10, 'Нанеси 5 урона', 5, 0, 'images/card30.jpg'),
+	(3, 20, 'Нанеси 3 урона', 3, 0, 'images/card31.jpg'),
+	(3, 20, 'Нанеси 3 урона', 3, 0, 'images/card31.jpg'),
+	(3, 3, 'Нанеси 7 урона', 7, 0, 'images/card32.jpg'),
+	(3, 3, 'Нанеси 7 урона', 7, 0, 'images/card32.jpg'),
+	(3, 7, 'Нанеси 3 урона', 3, 0, 'images/card33.jpg'),
+	(3, 7, 'Нанеси 3 урона', 3, 0, 'images/card33.jpg'),
+	(3, 4, 'Нанеси 2 урона', 2, 0, 'images/card34.jpg'),
+	(3, 4, 'Нанеси 2 урона', 2, 0, 'images/card34.jpg'),
+	(3, 6, 'Нанеси 2 урона', 2, 0, 'images/card35.jpg'),
+	(3, 6, 'Нанеси 2 урона', 2, 0, 'images/card35.jpg'),
+	(3, 11, 'Нанеси 2 урона', 2, 0, 'images/card36.jpg'),
+	(3, 11, 'Нанеси 2 урона', 2, 0, 'images/card36.jpg'),
+	(3, 18, 'Нанеси 2 урона', 2, 0, 'images/card37.jpg'),
+	(3, 18, 'Нанеси 2 урона', 2, 0, 'images/card37.jpg'),
+	(3, 5, 'Нанеси 3 урона', 3, 0, 'images/card38.jpg'),
+	(3, 5, 'Нанеси 3 урона', 3, 0, 'images/card38.jpg'),
+	(3, 8, 'Нанеси 3 урона, ты отхватываешь 1 урон', 3, -1, 'images/card39.jpg'),
+	(3, 8, 'Нанеси 3 урона, ты отхватываешь 1 урон', 3, -1, 'images/card39.jpg')
+	;
+
+
+//////////////////////////////////
+granting
+//////////////////////////////////
+
+-- Предоставление прав на выполнение функции createGame
+GRANT EXECUTE ON FUNCTION createGame(VARCHAR, VARCHAR) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции goinGame
+GRANT EXECUTE ON FUNCTION goinGame(VARCHAR, VARCHAR, INTEGER) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции gooutGame
+GRANT EXECUTE ON FUNCTION gooutGame(VARCHAR, VARCHAR, INTEGER) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции first_phase
+GRANT EXECUTE ON FUNCTION first_phase(INTEGER[]) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции second_phase
+GRANT EXECUTE ON FUNCTION second_phase(INTEGER) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции assign_random_cards
+GRANT EXECUTE ON FUNCTION assign_random_cards(INTEGER) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции start_game
+GRANT EXECUTE ON FUNCTION start_game(INTEGER[], INTEGER) TO PUBLIC;
+
+-- Предоставление прав на выполнение функции set_cards_chosen
+GRANT EXECUTE ON FUNCTION set_cards_chosen(INTEGER) TO PUBLIC;
