@@ -14,7 +14,6 @@ if (!$room_id || !$selected_cards) {
 }
 
 try {
-    
     error_log("room_id: " . $room_id);
     error_log("selected_cards: " . print_r($selected_cards, true));
     error_log("login: " . $login);
@@ -33,7 +32,6 @@ try {
     $stmt->execute();
     $players = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    
     foreach ($selected_cards as $cardType => $cardId) {
         if ($cardId) {
             error_log("Deleting card: id_player=" . $currentPlayer['id_player'] . ", id_card=" . $cardId);
@@ -44,7 +42,6 @@ try {
         }
     }
 
-    
     foreach ($selected_cards as $cardType => $cardId) {
         if ($cardId) {
             error_log("Inserting into Chosen_cards: id_player=" . $currentPlayer['id_player'] . ", id_card=" . $cardId);
@@ -55,7 +52,6 @@ try {
         }
     }
 
-   
     foreach ($selected_cards as $cardType => $cardId) {
         if ($cardId) {
             error_log("Inserting into Spells: id_player=" . $currentPlayer['id_player'] . ", id_card=" . $cardId . ", card_position=" . $cardType);
@@ -67,37 +63,17 @@ try {
         }
     }
 
-    
     error_log("Updating Players: id_player=" . $currentPlayer['id_player']);
     $stmt = $conn->prepare("UPDATE Players SET cards_chosen = TRUE WHERE id_player = :id_player");
     $stmt->bindParam(':id_player', $currentPlayer['id_player'], PDO::PARAM_INT);
     $stmt->execute();
 
-   
     $allPlayersReady = true;
     foreach ($players as $player) {
         if (!$player['cards_chosen']) {
             $allPlayersReady = false;
             break;
         }
-    }
-    if ($allPlayersReady) {
-       
-        error_log("Updating Games: id_game=" . $room_id);
-        $stmt = $conn->prepare("UPDATE Games SET current_timee = current_timee + 120 WHERE id_game = :id_game");
-        $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
-        if ($stmt->execute()) {
-            error_log("Updated current_timee for room_id $room_id");
-        } else {
-            error_log("Failed to update current_timee for room_id $room_id");
-        }
-
-        
-        $stmt = $conn->prepare("SELECT current_timee FROM Games WHERE id_game = :id_game");
-        $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
-        $stmt->execute();
-        $updated_time = $stmt->fetch(PDO::FETCH_ASSOC)['current_timee'];
-        error_log("Updated current_timee for room_id $room_id: $updated_time");
     }
 
     echo json_encode(['success' => true, 'players' => $players, 'my_login' => $login, 'all_players_ready' => $allPlayersReady]);

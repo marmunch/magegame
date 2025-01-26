@@ -15,7 +15,7 @@ if (!$room_id || !$card_id || !$card_position || !$player_id) {
 }
 
 try {
-    // Получаем информацию о карте
+    
     $stmt = $conn->prepare("SELECT cardtype, lead, heal, damage FROM Cards WHERE id_card = :card_id");
     $stmt->bindParam(':card_id', $card_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -25,19 +25,19 @@ try {
         throw new Exception('Карта не найдена');
     }
 
-    // Получаем информацию о всех игроках в комнате
+  
     $stmt = $conn->prepare("SELECT id_player, lives, tokens FROM Players WHERE id_game = :id_game");
     $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
     $stmt->execute();
     $players = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Применяем эффекты карты
+    
     $player_killed = false;
     $killer_id = null;
 
     foreach ($players as $player) {
         if ($player['id_player'] != $player_id) {
-            // Применяем урон к другим игрокам
+            
             $new_lives = max(0, $player['lives'] - $card['damage']);
             $stmt = $conn->prepare("UPDATE Players SET lives = :lives WHERE id_player = :id_player");
             $stmt->bindParam(':lives', $new_lives, PDO::PARAM_INT);
@@ -49,7 +49,7 @@ try {
                 $killer_id = $player_id;
             }
         } else {
-            // Применяем лечение к игроку, который сыграл карту
+            
             $new_lives = $player['lives'] + $card['heal'];
             $stmt = $conn->prepare("UPDATE Players SET lives = :lives WHERE id_player = :id_player");
             $stmt->bindParam(':lives', $new_lives, PDO::PARAM_INT);
@@ -59,14 +59,14 @@ try {
     }
 
     if ($player_killed) {
-        // Восстанавливаем жизни всех игроков
+        
         foreach ($players as $player) {
             $stmt = $conn->prepare("UPDATE Players SET lives = 20 WHERE id_player = :id_player");
             $stmt->bindParam(':id_player', $player['id_player'], PDO::PARAM_INT);
             $stmt->execute();
         }
 
-        // Добавляем токен убийце
+        
         if ($killer_id !== null) {
             $stmt = $conn->prepare("UPDATE Players SET tokens = tokens + 1 WHERE id_player = :id_player");
             $stmt->bindParam(':id_player', $killer_id, PDO::PARAM_INT);

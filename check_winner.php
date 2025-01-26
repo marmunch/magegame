@@ -12,13 +12,13 @@ if (!$room_id) {
 }
 
 try {
-    // Получаем информацию о всех игроках в комнате
+    
     $stmt = $conn->prepare("SELECT id_player, tokens FROM Players WHERE id_game = :id_game");
     $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
     $stmt->execute();
     $players = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Проверяем, есть ли победитель
+    
     $winner = null;
     foreach ($players as $player) {
         if ($player['tokens'] >= 2) {
@@ -28,12 +28,12 @@ try {
     }
 
     if ($winner) {
-        // Удаляем комнату
+        
         $stmt = $conn->prepare("DELETE FROM Games WHERE id_game = :id_game");
         $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
         $stmt->execute();
 
-        // Удаляем всех игроков из комнаты
+        
         $stmt = $conn->prepare("DELETE FROM Players WHERE id_game = :id_game");
         $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
         $stmt->execute();

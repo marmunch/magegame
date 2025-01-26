@@ -7,39 +7,87 @@ document.addEventListener('DOMContentLoaded', function() {
     const myCardsContainer = document.querySelector('.mycards');
     const livesElements = document.querySelectorAll('.lives-count');
     const tokensElements = document.querySelectorAll('.tokens-count');
-    const cardsContainer = document.querySelector('.cards');    
+    const cardsContainer = document.querySelector('.cards');
     const playersContainer = document.getElementById('playersContainer');
-
+    
+    
     let timer;
-    let selectedCards = { 1: null, 2: null, 3: null }; 
+    let selectedCards = { 1: null, 2: null, 3: null };
     let currentPlayerIndex = 0;
     let players = {};
     let room_id;
     let current_timee;
-    let phase = 1; 
+    let phase = 1;
     let cardQueue = [];
     let allPlayersReady = false;
     let allCardsSelected = false;
     let myLogin;
-    let checkPlayersReady = true; 
-
+    let checkPlayersReady = true;
+    
+   
+    const socket = new WebSocket('ws://localhost:8080');
+    
+    socket.onopen = function(event) {
+        console.log('WebSocket is open now.');
+       
+        loadGameInfo();
+        updateCardsInHand();
+    };
+    
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('Received message:', data);
+        if (data.type === 'timer') {
+            updateTimer(data.timeLeft);
+        } else if (data.type === 'gameInfo') {
+            loadGameInfo(data);
+        } else if (data.type === 'startPhase2') {
+            console.log('Received startPhase2 message');
+            setTimeout(() => {
+                startPhase2();
+            }, 2000); 
+        } else if (data.type === 'checkPlayersReady') {
+            allPlayersReady = data.allPlayersReady;
+            if (allPlayersReady && phase === 1) {
+                phase = 2;
+                startPhase2();
+            }
+        } else if (data.type === 'checkPhase2') {
+            console.log('Received checkPhase2 message');
+            checkPhase2(data.room_id);
+        } else if (data.type === 'playerReady') {
+            console.log(`Player ${data.login} is ready`);
+            
+            checkPhase2(room_id);
+        }
+    };
+    
+    socket.onclose = function(event) {
+        console.log('WebSocket is closed now.');
+    };
+    
+    socket.onerror = function(error) {
+        console.log('WebSocket error: ', error);
+    };
+    
     burgerMenu.addEventListener('click', function() {
         burgerMenu.classList.toggle('active');
         menu.classList.toggle('active');
     });
-
+    
+    
     function updateCardsChosenStatus() {
         return fetch(`update_cards_chosen_status.php?room_id=${room_id}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Ошибка сети: ' + response.statusText);
                 }
-                return response.text(); 
+                return response.text();
             })
             .then(text => {
-                console.log('Server response:', text); 
+                console.log('Server response:', text);
                 try {
-                    const data = JSON.parse(text); 
+                    const data = JSON.parse(text);
                     if (data.success) {
                         console.log('Cards chosen status updated successfully');
                     } else {
@@ -51,23 +99,30 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => console.error('Ошибка:', error));
     }
-
+    
+    function startTimer(timeLeft) {
+        clearInterval(timer);
+        timer = setInterval(() => {
+            timeLeft--;
+            updateTimer(timeLeft);
+        }, 1000);
+    }
+    
     function loadGameInfo() {
         const urlParams = new URLSearchParams(window.location.search);
         room_id = urlParams.get('room_id');
     
         fetch(`get_game_info.php?room_id=${room_id}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка сети: ' + response.statusText);
-            }
-            return response.text(); 
-        })
-        .then(text => {
-            console.log('Server response:', text); 
-            try {
-                const data = JSON.parse(text); 
-                if (data.success) {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Ошибка сети: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+    
+                if (data && data.success) {
                     players = {};
                     myLogin = data.my_login;
                     current_timee = data.current_timee;
@@ -75,16 +130,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('Loaded players:', data.players);
                     console.log('Current time:', current_timee);
     
-                    
                     playersContainer.innerHTML = '';
     
                     data.players.forEach((player, index) => {
-                        const playerIndex = index + 1; 
+                        const playerIndex = index + 1;
                         players[playerIndex] = player;
                         if (player.login !== myLogin) {
                             let playerElement = document.createElement('div');
-                            playerElement.classList.add('player', `enemy${playerIndex}`); 
-                            playerElement.dataset.id = player.id_player; 
+                            playerElement.classList.add('player', `enemy${playerIndex}`);
+                            playerElement.dataset.id = player.id_player;
                             playersContainer.appendChild(playerElement);
                             console.log(`Created player element for id ${player.id_player}`);
     
@@ -100,8 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     const myPlayer = Object.values(players).find(player => player.login === myLogin);
                     if (myPlayer) {
                         const myCharElement = document.querySelector('.mychar');
-                        myCharElement.classList.add('player'); 
-                        myCharElement.dataset.id = myPlayer.id_player; 
+                        myCharElement.classList.add('player');
+                        myCharElement.dataset.id = myPlayer.id_player;
                         myCharElement.querySelector('.myicon').style.backgroundImage = `url('${myPlayer.character}')`;
                         myCharElement.querySelector('.lives-count').textContent = myPlayer.lives;
                         myCharElement.querySelector('.tokens-count').textContent = myPlayer.tokens;
@@ -110,45 +164,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
     
                     const myCards = data.my_cards;
-                    console.log('My Cards:', myCards); 
+                    console.log('My Cards:', myCards);
                     myCardsContainer.innerHTML = '';
                     if (myCards && myCards.length > 0) {
                         myCards.forEach(card => {
                             const cardElement = document.createElement('div');
                             cardElement.classList.add('mycard');
                             cardElement.style.backgroundImage = `url('${card.png}')`;
-                            cardElement.dataset.cardtype = card.cardtype; 
+                            cardElement.dataset.cardtype = card.cardtype;
                             cardElement.addEventListener('click', () => selectCard(card.id_card, card.descr, card.cardtype));
                             myCardsContainer.appendChild(cardElement);
                         });
                     } else {
                         console.error('No cards found for the player.');
-                       
+    
                         updateCardsInHand();
                     }
     
-                    
                     allPlayersReady = data.all_players_ready;
-                    console.log('All players ready:', allPlayersReady); 
+                    console.log('All players ready:', allPlayersReady);
     
-                    
                     phase = data.phase;
                     if (phase === 2) {
                         console.log('Starting phase 2...');
                         startPhase2();
                     } else {
                         console.log('Phase 1 continues...');
-                        startTimer(current_timee);
+                        startTimer(current_timee); // Запуск таймера
                     }
                 } else {
-                    console.error('Ошибка:', data.message);
+                    console.error('Ошибка:', data ? data.message : 'Нет данных');
                 }
-            } catch (e) {
-                console.error('Ошибка парсинга JSON:', e);
-            }
-        })
-        .catch(error => console.error('Ошибка:', error));
-    }
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }    
     
     function selectCard(cardId, cardDescr, cardType) {
         if (!selectedCards[cardType] && !Object.values(selectedCards).includes(cardType)) {
@@ -158,52 +207,29 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Card type already selected or invalid card type');
         }
     }
-
-    function startTimer(initialTime) {
-        let timeLeft = initialTime;
-        let startTime = Date.now();
     
-        function updateTimer() {
-            const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-            timeLeft = initialTime - elapsedTime;
-            timeElement.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                playButton.disabled = false;
-                playButton.textContent = 'Сыграть';
-                playButton.style.backgroundColor = '#51E03F';
-                playButton.style.cursor = 'pointer';
-                playCards();
-            }
+    function updateTimer(timeLeft) {
+        timeElement.textContent = timeLeft;
+        if (timeLeft <= 0) {
+            playButton.disabled = false;
+            playButton.textContent = 'Сыграть';
+            playButton.style.backgroundColor = '#51E03F';
+            playButton.style.cursor = 'pointer';
+            playCards();
         }
-    
-        updateTimer();
-        timer = setInterval(updateTimer, 1000);
-    
-        setInterval(() => {
-            fetch(`get_current_timee.php?room_id=${room_id}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const serverTime = data.current_timee;
-                    const timeDifference = serverTime - timeLeft;
-                    startTime += timeDifference * 1000;
-    
-                    // Обновляем время в базе данных
-                    updateGameTime(room_id, timeLeft);
-                }
-            })
-            .catch(error => console.error('Ошибка:', error));
-        }, 1000);
     }
     
-    function updateGameTime(room_id, new_time) {
-        fetch('update_current_timee.php', {
+    function playCards() {
+        console.log('Playing cards...');
+        console.log('Selected Cards:', selectedCards);
+        console.log('Room ID:', room_id);
+    
+        fetch('play_cards.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `room_id=${room_id}&new_time=${new_time}`
+            body: `room_id=${room_id}&selected_cards=${encodeURIComponent(JSON.stringify(selectedCards))}`
         })
         .then(response => {
             if (!response.ok) {
@@ -216,50 +242,13 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const data = JSON.parse(text);
                 if (data.success) {
-                    console.log('Game time updated successfully');
-                } else {
-                    console.error('Ошибка:', data.message);
-                }
-            } catch (e) {
-                console.error('Ошибка парсинга JSON:', e);
-            }
-        })
-        .catch(error => console.error('Ошибка:', error));
-    }
-    
-    // Пример использования функции
-    ;
-    
-    function playCards() {
-        console.log('Playing cards...');
-        console.log('Selected Cards:', selectedCards); 
-        console.log('Room ID:', room_id); 
-
-        fetch('play_cards.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `room_id=${room_id}&selected_cards=${encodeURIComponent(JSON.stringify(selectedCards))}`
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка сети: ' + response.statusText);
-            }
-            return response.text(); 
-        })
-        .then(text => {
-            console.log('Server response:', text); 
-            try {
-                const data = JSON.parse(text); 
-                if (data.success) {
                     players = {};
                     data.players.forEach((player, index) => {
-                        const playerIndex = index + 1; 
+                        const playerIndex = index + 1;
                         players[playerIndex] = player;
                     });
                     console.log('Updated players:', players);
-
+    
                     Object.values(players).forEach(player => {
                         let playerElement = document.querySelector(`.player[data-id="${player.id_player}"]`);
                         if (playerElement) {
@@ -270,21 +259,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             console.error(`Player element with id ${player.id_player} not found`);
                         }
                     });
-
-                    selectedCards = { 1: null, 2: null, 3: null }; 
+    
+                    selectedCards = { 1: null, 2: null, 3: null };
                     effectElement.innerHTML = '';
-
+    
                     currentPlayerIndex = (currentPlayerIndex + 1) % Object.keys(players).length;
-
-                    
+    
                     allPlayersReady = Object.values(players).every(player => player.cards_chosen);
                     allCardsSelected = Object.values(selectedCards).every(card => card !== null);
                     if (allPlayersReady && allCardsSelected && phase === 1) {
                         phase = 2;
-                        startPhase2();
+                        console.log('Sending startPhase2 message via WebSocket');
+                        socket.send(JSON.stringify({ type: 'startPhase2', room_id: room_id }));
                     } else {
-                        loadGameInfo(); 
+                        loadGameInfo();
                     }
+                    socket.send(JSON.stringify({ type: 'playerReady', room_id: room_id, login: myLogin }));
                 } else {
                     alert('Ошибка при выполнении хода: ' + data.message);
                 }
@@ -294,12 +284,28 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Ошибка:', error));
     }
-
+    
+    function checkPhase2(room_id) {
+        fetch(`get_game_info.php?room_id=${room_id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка сети: ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Check Phase 2 response:', data);
+            if (data.success && data.phase === 2) {
+                phase = 2;
+                startPhase2();
+            }
+        })
+        .catch(error => console.error('Ошибка:', error));
+    }
+    
     function startPhase2() {
         console.log('Phase 2 started!');
         checkPlayersReady = false;
-    
-        clearInterval(timer);
     
         updateCardsChosenStatus()
         .then(() => {
@@ -457,18 +463,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateCardsInHand();
                         resetCardsChosen();
                         cardsContainer.innerHTML = '';
-                        checkPlayersReady = true;
-    
-                        // Сброс таймера до 120 секунд
-                        startTimer(120);
-    
-                        // Активация кнопки "Сыграть"
+                        checkPlayersReady = true; 
                         playButton.disabled = false;
                         playButton.textContent = 'Сыграть';
                         playButton.style.backgroundColor = '#51E03F';
                         playButton.style.cursor = 'pointer';
-    
-                        // Проверка наличия победителя
                         checkWinner();
                     } else {
                         console.log('Waiting for more cards to be played...');
@@ -496,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     if (data.winner) {
                         console.log('Winner found:', data.winner);
-                        // Перенаправление на php.php
+                    
                         window.location.href = 'php.php';
                     } else {
                         console.log('No winner yet');
@@ -535,7 +534,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = JSON.parse(text);
                 if (data.success) {
                     console.log('Card effects applied successfully');
-                    // Обновите интерфейс после применения эффектов карт
+                 
                     updatePlayerUI();
                 } else {
                     console.error('Ошибка:', data.message);
@@ -548,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updatePlayerUI() {
-        // Обновите интерфейс игроков после применения эффектов карт
+    
         fetch(`get_game_info.php?room_id=${room_id}`)
         .then(response => response.text())
         .then(text => {
@@ -598,20 +597,20 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 throw new Error('Ошибка сети: ' + response.statusText);
             }
-            return response.text(); 
+            return response.text();
         })
         .then(text => {
             try {
                 const data = JSON.parse(text);
                 if (data.success) {
-                    
+    
                     myCardsContainer.innerHTML = '';
                     if (data.cards && data.cards.length > 0) {
                         data.cards.forEach(card => {
                             const cardElement = document.createElement('div');
                             cardElement.classList.add('mycard');
                             cardElement.style.backgroundImage = `url('${card.png}')`;
-                            cardElement.dataset.cardtype = card.cardtype; 
+                            cardElement.dataset.cardtype = card.cardtype;
                             cardElement.addEventListener('click', () => selectCard(card.id_card, card.descr, card.cardtype));
                             myCardsContainer.appendChild(cardElement);
                         });
@@ -627,17 +626,17 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Ошибка:', error));
     }
-
+    
     function resetCardsChosen() {
         fetch(`reset_cards_chosen.php?room_id=${room_id}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error('Ошибка сети: ' + response.statusText);
             }
-            return response.text(); 
+            return response.text();
         })
         .then(text => {
-            console.log('Server response:', text); 
+            console.log('Server response:', text);
             try {
                 const data = JSON.parse(text);
                 if (data.success) {
@@ -651,53 +650,12 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Ошибка:', error));
     }
-
-    function checkAllPlayersReady() {
-        if (!checkPlayersReady) {
-            return; 
-        }
-        console.log('Checking all players ready...');
-        fetch(`get_game_info.php?room_id=${room_id}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Ошибка сети: ' + response.statusText);
-            }
-            return response.text(); 
-        })
-        .then(text => {
-            console.log('Server response:', text);
-            try {
-                const data = JSON.parse(text); 
-                if (data.success) {
-                    allPlayersReady = data.all_players_ready;
-                    console.log('Checking all players ready:', allPlayersReady); 
-                    if (allPlayersReady && phase === 1) {
-                        console.log('Starting phase 2...');
-                        phase = 2;
-                        startPhase2();
-                    }
-                } else {
-                    console.error('Ошибка:', data.message);
-                }
-            } catch (e) {
-                console.error('Ошибка парсинга JSON:', e);
-            }
-        })
-        .catch(error => console.error('Ошибка:', error));
-    }
-
+    
     playButton.addEventListener('click', function() {
-        clearInterval(timer);
         playButton.disabled = true;
         playButton.textContent = 'Играет...';
         playButton.style.backgroundColor = '#E42828';
         playButton.style.cursor = 'not-allowed';
         playCards();
     });
-
-    updateCardsInHand();
-
-    loadGameInfo();
-
-    setInterval(checkAllPlayersReady, 1000);
-});
+    });

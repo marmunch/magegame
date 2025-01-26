@@ -2,6 +2,11 @@
 session_start();
 include 'db.php';
 
+use Ratchet\Client\Connector;
+use Ratchet\Client\WebSocket;
+use React\EventLoop\Factory;
+use React\Promise\Promise;
+
 header('Content-Type: application/json');
 
 $room_id = isset($_POST['room_id']) ? intval($_POST['room_id']) : null;
@@ -18,6 +23,23 @@ try {
     $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
     if ($stmt->execute()) {
         echo json_encode(['success' => true, 'message' => 'Время обновлено']);
+
+       
+        require __DIR__ . '/vendor/autoload.php';
+
+        $loop = Factory::create();
+        $connector = new Connector($loop);
+
+        $connector('ws://localhost:8080')
+            ->then(function(WebSocket $conn) use ($new_time) {
+                $conn->send(json_encode(['type' => 'timer', 'timeLeft' => $new_time]));
+                $conn->close();
+            }, function(\Exception $e) use ($loop) {
+                echo 'Could not connect: ' . $e->getMessage();
+                $loop->stop();
+            });
+
+        $loop->run();
     } else {
         throw new Exception('Ошибка обновления времени');
     }

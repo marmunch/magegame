@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const noBtn = document.querySelector('.no');
     const inviterElement = document.querySelector('.inviter');
 
-    // Скрываем блок с приглашением по умолчанию
+  
     inviteBox.style.display = 'none';
 
     charIcons.forEach(icon => {
