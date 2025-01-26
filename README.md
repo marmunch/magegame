@@ -12,8 +12,8 @@
 
 ## Подключение веб-сокета
 
-cd public_html/mages
-php server.php
+- cd public_html/mages
+- php server.php
 
 ## Использование
 
