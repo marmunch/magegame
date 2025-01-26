@@ -5,7 +5,7 @@ include 'db.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['login']) && isset($_POST['password'])) {
         $login = $_POST['login'];
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+        $password = hash('sha256', $_POST['password']);
 
         $stmt = $conn->prepare("SELECT * FROM users WHERE login = :login");
         $stmt->bindParam(':login', $login);
