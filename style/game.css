@@ -73,16 +73,56 @@ body{
     transform: translateY(0);
 }
 
-.menu ul {
-    list-style: none;
-    padding: 20px 0;
+.menu {
+    position: fixed;
+    top: 40px;
+    left: 10px;
+    width: 200px;
+    background-color: #303030;
+    display: none;
+    flex-direction: column;
+    z-index: 999;
+    padding: 10px;
+    border-radius: 5px;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.menu ul li {
-    margin: 10px 0;
+.menu.active {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.burger {
+    list-style: none;
+    padding: 20px 0;
+    text-align: center;
+    
+}
+
+.burger_li {
+    margin: 20px 0px;
     color: white;
     cursor: pointer;
+    text-align: center;
+    font-size: larger;
 }
+
+.burger_li a{
+    text-decoration: none;
+    color: white;
+}
+
+.burger_li a:hover{
+    color: #FFE629;
+}
+
+.burger li:hover {
+    color: #FFE629;
+}
+
 .wrapper{
     display: flex;
     flex-direction: column;
@@ -104,11 +144,45 @@ body{
 .icon{
     width: 100px;
     height: 100px;
-    
+    position: relative;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    border-radius: 10px;
 }
+
+.enemy_stats{
+    position: absolute;
+    bottom: 1px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.enemy_stats div{
+    display: flex;
+    flex-direction: row;
+   
+}
+
+.enemy_stats div span{
+    font-size: medium;
+    paint-order: stroke fill;
+    -webkit-text-stroke:5px #000000;
+}
+
+.enemy_stats div img{
+    width: 50%;
+    height: 50%;
+}
+
+.nick{
+    
+    align-items: center;
+    paint-order: stroke fill;
+    -webkit-text-stroke:5px #000000;
+}
+
 
 .center{
     display: flex;
@@ -158,6 +232,8 @@ background-position: center;
     position: relative;
 }
 
+
+
 .mychar{
     display: flex;
     flex-direction: column;
@@ -172,6 +248,23 @@ background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    position: relative;
+    border-radius: 10px;
+}
+
+.mystats{
+    position: absolute;
+    bottom: 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    
+}
+
+.mystats div span{
+    font-size: larger;
+    paint-order: stroke fill;
+    -webkit-text-stroke:5px #000000;
 }
 
 
@@ -182,6 +275,8 @@ background-position: center;
     
 }
 
+
+
 .mycards{
     display: flex;
     flex-direction: row;
@@ -189,15 +284,39 @@ background-position: center;
     margin-top: -85px;
 }
 
+@keyframes glowing {
+    0% {
+      background-color: #2ba805;
+      box-shadow: 0 0 5px #2ba805;
+    }
+    50% {
+      background-color: #49e819;
+      box-shadow: 0 0 20px #49e819;
+    }
+    100% {
+      background-color: #2ba805;
+      box-shadow: 0 0 5px #2ba805;
+    }
+  }
+  
+
 .mycard{
   width: 100px;
   height: 150px;
   margin: 10px;
-  
+  border-radius: 10px;
   background-size: cover;
   background-position: center;
   cursor: pointer;
+  animation: none;
+  
 }
+
+.mycard.glowing  {
+    animation: glowing 1300ms infinite;
+  }
+
+
 
 .mycard:hover{
     width: 120px;
@@ -205,10 +324,17 @@ background-position: center;
     margin-top: -30px;
 }
 
+
+
 .effect{
+    display: flex;
     background-color: #525252;
     width: 100%;
     height: 150px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 10px;
 }
 
 .active{
@@ -239,6 +365,13 @@ background-position: center;
     width: 120px;
     height: 120px;
     background-color: #525252;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    paint-order: stroke fill;
+    -webkit-text-stroke:5px #000000;
+    font-size: x-large;
+    border-radius: 10px;
 }
 
 .lives, .tokens {

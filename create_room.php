@@ -15,36 +15,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
-        
         $conn->beginTransaction();
 
-       
-        $stmt = $conn->prepare("INSERT INTO Games (status) VALUES (0)");
+        // Создание комнаты с установкой времени начала раунда
+        $stmt = $conn->prepare("INSERT INTO Games (status, time_start_round) VALUES (0, NOW())");
         if ($stmt->execute()) {
             $room_id = $conn->lastInsertId();
 
-            
+            // Добавление игрока в комнату
             $stmt = $conn->prepare("INSERT INTO Players (login, id_game) VALUES (:login, :id_game)");
             $stmt->bindParam(':login', $login);
             $stmt->bindParam(':id_game', $room_id);
             if ($stmt->execute()) {
-                
                 $conn->commit();
                 echo json_encode(['success' => true, 'room_id' => $room_id]);
             } else {
-                
                 $conn->rollBack();
                 logError('Ошибка при добавлении игрока в комнату: ' . $stmt->errorInfo()[2]);
                 echo json_encode(['success' => false, 'message' => 'Ошибка при добавлении игрока в комнату']);
             }
         } else {
-            
             $conn->rollBack();
             logError('Ошибка при создании комнаты: ' . $stmt->errorInfo()[2]);
             echo json_encode(['success' => false, 'message' => 'Ошибка при создании комнаты']);
         }
     } catch (PDOException $e) {
-        
         $conn->rollBack();
         logError('Ошибка базы данных: ' . $e->getMessage());
         echo json_encode(['success' => false, 'message' => 'Ошибка базы данных: ' . $e->getMessage()]);

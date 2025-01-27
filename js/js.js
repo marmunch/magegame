@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     roomDiv.innerHTML = `
                         <p>${room.creator}</p>
                         <p>Комната ${room.room_id}</p>
-                        <p>${room.player_count}/4</p>
+                        <p>${room.player_count}/2</p>
                         <button type="button" class="come_in" data-room-id="${room.room_id}">Войти</button>
                     `;
                     roomsContainer.appendChild(roomDiv);
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     fetch(`check_player_in_room.php?room_id=${roomId}`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.player_count < 4 && !data.is_player_in_room) {
+                        if (data.player_count < 2 && !data.is_player_in_room) {
                             fetch('join_room.php', {
                                 method: 'POST',
                                 headers: {

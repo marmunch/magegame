@@ -2,52 +2,51 @@
 session_start();
 include 'db.php';
 
-use Ratchet\Client\Connector;
-use Ratchet\Client\WebSocket;
-use React\EventLoop\Factory;
-use React\Promise\Promise;
-
-header('Content-Type: application/json');
-
-$room_id = isset($_POST['room_id']) ? intval($_POST['room_id']) : null;
-$new_time = isset($_POST['new_time']) ? intval($_POST['new_time']) : null;
-
-if (!$room_id || !$new_time) {
-    echo json_encode(['success' => false, 'message' => 'Неверные данные запроса']);
-    exit;
+function logError($message) {
+    file_put_contents('error_log.txt', $message . PHP_EOL, FILE_APPEND);
 }
 
-try {
-    $stmt = $conn->prepare("UPDATE Games SET current_timee = :new_time WHERE id_game = :id_game");
-    $stmt->bindParam(':new_time', $new_time, PDO::PARAM_INT);
-    $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'message' => 'Время обновлено']);
 
-       
-        require __DIR__ . '/vendor/autoload.php';
+function getDatabaseTime($conn) {
+    $stmt = $conn->query("SELECT NOW() AS db_time");
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return new DateTime($result['db_time'], new DateTimeZone('Europe/Moscow'));
+}
 
-        $loop = Factory::create();
-        $connector = new Connector($loop);
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $room_id = $_POST['room_id'];
 
-        $connector('ws://localhost:8080')
-            ->then(function(WebSocket $conn) use ($new_time) {
-                $conn->send(json_encode(['type' => 'timer', 'timeLeft' => $new_time]));
-                $conn->close();
-            }, function(\Exception $e) use ($loop) {
-                echo 'Could not connect: ' . $e->getMessage();
-                $loop->stop();
-            });
-
-        $loop->run();
-    } else {
-        throw new Exception('Ошибка обновления времени');
+    if (!$room_id) {
+        echo json_encode(['success' => false, 'message' => 'ID комнаты не указан']);
+        exit;
     }
-} catch (PDOException $e) {
-    error_log("Ошибка базы данных: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => 'Ошибка базы данных: ' . $e->getMessage()]);
-} catch (Exception $e) {
-    error_log("Ошибка: " . $e->getMessage());
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+
+    try {
+        
+        $current_time = getDatabaseTime($conn);
+
+        
+        logError("Current time from database: " . $current_time->format('Y-m-d H:i:s'));
+
+        
+        $current_time_formatted = $current_time->format('Y-m-d H:i:s');
+        $current_time->f = 0;     
+        
+        $stmt = $conn->prepare("UPDATE Games SET time_start_round = :current_time WHERE id_game = :room_id");
+        $stmt->bindParam(':room_id', $room_id);
+        $stmt->bindParam(':current_time', $current_time_formatted);
+
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true]);
+        } else {
+            logError('Ошибка при обновлении времени начала раунда: ' . $stmt->errorInfo()[2]);
+            echo json_encode(['success' => false, 'message' => 'Ошибка при обновлении времени начала раунда']);
+        }
+    } catch (PDOException $e) {
+        logError('Ошибка базы данных: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Ошибка базы данных: ' . $e->getMessage()]);
+    }
+} else {
+    echo json_encode(['success' => false, 'message' => 'Неверный метод запроса']);
 }
 ?>

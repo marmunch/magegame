@@ -293,7 +293,7 @@ body{
     flex-direction: column;
     justify-content: space-between;
     text-align: center;
-
+    
     position: relative;
     font-size: medium;
 
@@ -321,7 +321,7 @@ body{
  .btns button{
     width: 120px;
     height: 40px;
-    font-size: x-large;
+    font-size: larger;
     border: none;
     border-radius: 5px;
     color: white;

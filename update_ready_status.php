@@ -19,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bindParam(':id_game', $room_id);
         $stmt->execute();
 
-      
         $stmt = $conn->prepare("SELECT COUNT(*) AS ready_count FROM Players WHERE id_game = :id_game AND ready = TRUE");
         $stmt->bindParam(':id_game', $room_id);
         $stmt->execute();
@@ -31,12 +30,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $player_count = $stmt->fetch(PDO::FETCH_ASSOC)['player_count'];
 
         if ($ready_count >= 2 && $ready_count == $player_count) {
-           
-            $stmt = $conn->prepare("UPDATE Games SET status = 1 WHERE id_game = :id_game");
+            $stmt = $conn->prepare("UPDATE Games SET status = 1, time_start_round = NOW() WHERE id_game = :id_game");
             $stmt->bindParam(':id_game', $room_id);
             $stmt->execute();
 
-            echo json_encode(['success' => true, 'redirect' => 'game.html']);
+            echo json_encode(['success' => true, 'redirect' => 'game.html?room_id=' . $room_id]);
         } else {
             echo json_encode(['success' => true]);
         }
