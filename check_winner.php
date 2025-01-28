@@ -12,20 +12,36 @@ if (!$room_id) {
 }
 
 try {
-    $stmt = $conn->prepare("SELECT id_player, login, tokens FROM Players WHERE id_game = :id_game");
+    
+    $stmt = $conn->prepare("SELECT id_player, tokens FROM Players WHERE id_game = :id_game");
     $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
     $stmt->execute();
     $players = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    
     $winner = null;
     foreach ($players as $player) {
         if ($player['tokens'] >= 2) {
-            $winner = $player['login'];
+            $winner = $player['id_player'];
             break;
         }
     }
 
-    echo json_encode(['success' => true, 'winner' => $winner]);
+    if ($winner) {
+        
+        $stmt = $conn->prepare("DELETE FROM Games WHERE id_game = :id_game");
+        $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        
+        $stmt = $conn->prepare("DELETE FROM Players WHERE id_game = :id_game");
+        $stmt->bindParam(':id_game', $room_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        echo json_encode(['success' => true, 'winner' => $winner]);
+    } else {
+        echo json_encode(['success' => true, 'winner' => null]);
+    }
 } catch (PDOException $e) {
     error_log("Ошибка базы данных: " . $e->getMessage());
     echo json_encode(['success' => false, 'message' => 'Ошибка базы данных: ' . $e->getMessage()]);
