@@ -5,7 +5,7 @@ include 'db.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['login']) && isset($_POST['password'])) {
         $login = $_POST['login'];
-        $password = $_POST['password'];
+        $password = hash('sha256', $_POST['password']);
 
         $stmt = $conn->prepare("SELECT * FROM Users WHERE login = :login");
         $stmt->bindParam(':login', $login);
@@ -13,11 +13,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result) {
-            if (password_verify($password, $result['password'])) {
+            if ($password === $result['password']) {
                 $_SESSION['login'] = $login;
                 $_SESSION['logged_in'] = true;
 
-               
                 setcookie('login', $login, time() + (86400 * 30), "/");
 
                 $token = bin2hex(random_bytes(16));

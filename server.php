@@ -31,7 +31,7 @@ class GameServer implements MessageComponentInterface {
         $data = json_decode($msg, true);
         if ($data['type'] === 'startPhase2') {
             $room_id = $data['room_id'];
-            
+            // Отправляем сообщение всем клиентам о начале второй фазы
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'startPhase2', 'room_id' => $room_id]));
@@ -39,7 +39,7 @@ class GameServer implements MessageComponentInterface {
                 }
             }
         } else if ($data['type'] === 'timer') {
-            
+            // Отправляем сообщение всем клиентам о таймере
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'timer', 'timeLeft' => $data['timeLeft']]));
@@ -52,8 +52,8 @@ class GameServer implements MessageComponentInterface {
             }
             $this->playersReady[$room_id]++;
     
-            
-            $allPlayersReady = $this->playersReady[$room_id] >= 2; 
+            // Проверяем, готовы ли все игроки
+            $allPlayersReady = $this->playersReady[$room_id] >= 2; // Предполагаем, что в игре 2 игрока
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'checkPlayersReady', 'allPlayersReady' => $allPlayersReady]));
@@ -61,7 +61,7 @@ class GameServer implements MessageComponentInterface {
             }
         } else if ($data['type'] === 'checkPhase2') {
             $room_id = $data['room_id'];
-            
+            // Отправляем сообщение всем клиентам для проверки начала второй фазы
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'checkPhase2', 'room_id' => $room_id]));
@@ -71,7 +71,7 @@ class GameServer implements MessageComponentInterface {
         } else if ($data['type'] === 'playerReady') {
             $room_id = $data['room_id'];
             $login = $data['login'];
-            
+            // Отправляем сообщение всем клиентам о готовности игрока
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'playerReady', 'room_id' => $room_id, 'login' => $login]));

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+        
     const burgerMenu = document.getElementById('burgerMenu');
     const menu = document.getElementById('menu');
     const playButton = document.querySelector('.play');
@@ -564,7 +565,42 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.winner) {
                         console.log('Winner found:', data.winner);
 
-                        window.location.href = 'php.php';
+                       
+                        const zzzElement = document.querySelector('.zzz');
+                        if (zzzElement) {
+                            zzzElement.style.display = 'flex';
+                        }
+
+                        
+                        const winnerElement = document.getElementById('winner');
+                        if (winnerElement) {
+                            winnerElement.textContent = data.winner;
+
+                       
+                            setTimeout(() => {
+                                window.location.href = 'php.php';
+
+                               
+                                fetch(`leave_room.php`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                    },
+                                    body: `room_id=${room_id}`
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        console.log('Комната удалена успешно');
+                                    } else {
+                                        console.error('Ошибка при удалении комнаты:', data.message);
+                                    }
+                                })
+                                .catch(error => console.error('Ошибка:', error));
+                            }, 5000);
+                        } else {
+                            console.error('Элемент winner не найден');
+                        }
                     } else {
                         console.log('No winner yet');
                     }

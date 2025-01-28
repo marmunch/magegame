@@ -10,7 +10,7 @@ function logError($message) {
 function getDatabaseTime($conn) {
     $stmt = $conn->query("SELECT NOW() AS db_time");
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return new DateTime($result['db_time'], new DateTimeZone('Europe/Moscow'));
+    return new DateTime($result['db_time'], new DateTimeZone('Europe/Mowsco'));
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET") {
         if ($stmt->execute()) {
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($result) {
-                $time_start_round = new DateTime($result['time_start_round'], new DateTimeZone('Europe/Moscow'));
+                $time_start_round = new DateTime($result['time_start_round'], new DateTimeZone('UTC'));
                 $current_time = getDatabaseTime($conn);
 
                 $interval = $time_start_round->diff($current_time);
