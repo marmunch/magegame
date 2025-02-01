@@ -118,26 +118,9 @@ class GameServer implements MessageComponentInterface {
 
 $loop = Factory::create();
 
-$certPath = __DIR__ . '/certificate.pem';
-$keyPath = __DIR__ . '/certificate.key';
-
-if (!file_exists($certPath) || !file_exists($keyPath)) {
-    die('SSL сертификаты не найдены.');
-}
-
-sleep(1);
 error_log("Starting WebSocket server...");
 
-$webSock = new SecureServer(
-    new Server('0.0.0.0:8081', $loop),
-    $loop,
-    [
-        'local_cert' => $certPath,
-        'local_pk' => $keyPath,
-        'allow_self_signed' => true,
-        'verify_peer' => false
-    ]
-);
+$webSock = new Server('0.0.0.0:8081', $loop);
 
 $webServer = new IoServer(
     new HttpServer(
@@ -149,5 +132,5 @@ $webServer = new IoServer(
     $loop
 );
 
-error_log("WebSocket server is running on wss://helios.cs.ifmo.ru:8081/");
+error_log("WebSocket server is running on ws://0.0.0.0:8081/");
 $loop->run();
