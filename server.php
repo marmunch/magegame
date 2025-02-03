@@ -132,5 +132,5 @@ $webServer = new IoServer(
     $loop
 );
 
-error_log("WebSocket server is running on ws://0.0.0.0:8081/");
+error_log("WebSocket server is running on wss://0.0.0.0:8081/");
 $loop->run();
