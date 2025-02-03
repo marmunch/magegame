@@ -1,8 +1,8 @@
 <?php
-$host = "localhost";
-$dbname = "mydatabase";
-$username = "admin";
-$password = "1";
+$host = "roundhouse.proxy.rlwy.net";
+$dbname = "railway";
+$username = "postgres";
+$password = "KFSoLApbvxoaalKiOwvCTQOGuxceDjSv";
 
 try {
     $conn = new PDO("pgsql:host=$host;dbname=$dbname", $username, $password);
