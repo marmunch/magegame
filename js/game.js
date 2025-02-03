@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let myLogin;
     let checkPlayersReady = true;
 
-    const socket = new WebSocket('wss://se.ifmo.ru/~s333884:8080');
+    const socket = new WebSocket('wss://magegame-production.up.railway.app:8081');
 
 
     socket.onopen = function(event) {
