@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>WebSocket Test</title>
+    <style>
+        .message {
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+        .info {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <div id="messages"></div>
+    <script>
+        const messagesDiv = document.getElementById('messages');
+
+        function addMessage(message, type = 'info') {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${type}`;
+            messageElement.textContent = message;
+            messagesDiv.appendChild(messageElement);
+        }
+
+       
+        setTimeout(function() {
+            addMessage('Попытка установления соединения...', 'info');
+            const socket = new WebSocket('wss://magegame-production.up.railway.app:8081');
+
+            socket.onopen = function(event) {
+                addMessage('Соединение установлено.', 'success');
+                addMessage('Событие onopen: ' + JSON.stringify(event), 'info');
+                socket.send('Hello Server!');
+                addMessage('Отправлено сообщение: Hello Server!', 'info');
+            };
+
+            socket.onmessage = function(event) {
+                addMessage('Получено сообщение: ' + event.data, 'info');
+                addMessage('Событие onmessage: ' + JSON.stringify(event), 'info');
+            };
+
+            socket.onclose = function(event) {
+                addMessage('Соединение закрыто.', 'error');
+                addMessage('Код события закрытия: ' + event.code, 'error');
+                addMessage('Причина закрытия соединения: ' + event.reason, 'error');
+                addMessage('Событие onclose: ' + JSON.stringify(event), 'error');
+            };
+
+            socket.onerror = function(error) {
+                addMessage('Ошибка WebSocket: ' + error.message, 'error');
+                addMessage('Событие onerror: ' + JSON.stringify(error), 'error');
+            };
+        }, 1000); 
+    </script>
+</body>
+</html>

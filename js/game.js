@@ -25,11 +25,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let myLogin;
     let checkPlayersReady = true;
 
-    const socket = new WebSocket('ws://localhost:8080');
+    const socket = new WebSocket('');
+
 
     socket.onopen = function(event) {
         console.log('WebSocket is open now.');
-
         loadGameInfo();
         updateCardsInHand();
     };
@@ -57,17 +57,19 @@ document.addEventListener('DOMContentLoaded', function() {
             checkPhase2(data.room_id);
         } else if (data.type === 'playerReady') {
             console.log(`Player ${data.login} is ready`);
-
             checkPhase2(room_id);
         }
     };
 
     socket.onclose = function(event) {
         console.log('WebSocket is closed now.');
+        console.log('Close event code: ', event.code);
+        console.log('Close event reason: ', event.reason);
     };
 
     socket.onerror = function(error) {
-        console.log('WebSocket error: ', error);
+        console.error('WebSocket error: ', error);
+        console.log('Checking if the server is running...');
     };
 
     burgerMenu.addEventListener('click', function() {
@@ -564,7 +566,38 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (data.winner) {
                         console.log('Winner found:', data.winner);
 
-                        window.location.href = 'php.php';
+                        const zzzElement = document.querySelector('.zzz');
+                        if (zzzElement) {
+                            zzzElement.style.display = 'flex';
+                        }
+
+                        const winnerElement = document.getElementById('winner');
+                        if (winnerElement) {
+                            winnerElement.textContent = data.winner;
+
+                            setTimeout(() => {
+                                window.location.href = 'php.php';
+
+                                fetch(`leave_room.php`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded',
+                                    },
+                                    body: `room_id=${room_id}`
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.success) {
+                                        console.log('Комната удалена успешно');
+                                    } else {
+                                        console.error('Ошибка при удалении комнаты:', data.message);
+                                    }
+                                })
+                                .catch(error => console.error('Ошибка:', error));
+                            }, 5000);
+                        } else {
+                            console.error('Элемент winner не найден');
+                        }
                     } else {
                         console.log('No winner yet');
                     }
