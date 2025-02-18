@@ -2,6 +2,9 @@
     "require": {
         "cboden/ratchet": "^0.4.4",
         "textalk/websocket": "^1.5",
-        "ratchet/pawl": "^0.4.1"
+        "ratchet/pawl": "^0.4.1",
+        "react/event-loop": "^1.5",
+        "react/socket": "^1.16",
+        "workerman/workerman": "^4.2"
     }
 }

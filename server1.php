@@ -16,33 +16,33 @@ class GameServer implements MessageComponentInterface {
     public function __construct() {
         $this->clients = new \SplObjectStorage;
         $this->playersReady = [];
-        error_log("GameServer initialized.");
     }
 
     public function onOpen(ConnectionInterface $conn) {
         $this->clients->attach($conn);
-        error_log("New connection! ({$conn->resourceId})");
+        echo "New connection! ({$conn->resourceId})\n";
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {    
+    public function onMessage(ConnectionInterface $from, $msg) {
         $numRecv = count($this->clients) - 1;
-        error_log(sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's'));
-
+        echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
+            , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
+    
         $data = json_decode($msg, true);
         if ($data['type'] === 'startPhase2') {
             $room_id = $data['room_id'];
+            // Отправляем сообщение всем клиентам о начале второй фазы
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'startPhase2', 'room_id' => $room_id]));
-                    error_log("Sent startPhase2 message to client {$client->resourceId}");
+                    echo "Sent startPhase2 message to client {$client->resourceId}\n";
                 }
             }
         } else if ($data['type'] === 'timer') {
+            // Отправляем сообщение всем клиентам о таймере
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'timer', 'timeLeft' => $data['timeLeft']]));
-                    error_log("Sent timer message to client {$client->resourceId}");
                 }
             }
         } else if ($data['type'] === 'checkPlayersReady') {
@@ -51,60 +51,55 @@ class GameServer implements MessageComponentInterface {
                 $this->playersReady[$room_id] = 0;
             }
             $this->playersReady[$room_id]++;
-
-            $allPlayersReady = $this->playersReady[$room_id] >= 2; 
+    
+            // Проверяем, готовы ли все игроки
+            $allPlayersReady = $this->playersReady[$room_id] >= 2; // Предполагаем, что в игре 2 игрока
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'checkPlayersReady', 'allPlayersReady' => $allPlayersReady]));
-                    error_log("Sent checkPlayersReady message to client {$client->resourceId}");
                 }
             }
         } else if ($data['type'] === 'checkPhase2') {
             $room_id = $data['room_id'];
+            // Отправляем сообщение всем клиентам для проверки начала второй фазы
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'checkPhase2', 'room_id' => $room_id]));
-                    error_log("Sent checkPhase2 message to client {$client->resourceId}");
+                    echo "Sent checkPhase2 message to client {$client->resourceId}\n";
                 }
             }
         } else if ($data['type'] === 'playerReady') {
             $room_id = $data['room_id'];
             $login = $data['login'];
+            // Отправляем сообщение всем клиентам о готовности игрока
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send(json_encode(['type' => 'playerReady', 'room_id' => $room_id, 'login' => $login]));
-                    error_log("Sent playerReady message to client {$client->resourceId}");
+                    echo "Sent playerReady message to client {$client->resourceId}\n";
                 }
             }
         } else {
             foreach ($this->clients as $client) {
                 if ($from !== $client) {
                     $client->send($msg);
-                    error_log("Sent message to client {$client->resourceId}");
                 }
             }
         }
     }
-
+    
     public function onClose(ConnectionInterface $conn) {
         $this->clients->detach($conn);
-        error_log("Connection {$conn->resourceId} has disconnected");
+        echo "Connection {$conn->resourceId} has disconnected\n";
     }
 
     public function onError(ConnectionInterface $conn, \Exception $e) {
-        error_log("An error has occurred: {$e->getMessage()}");
+        echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
     }
 }
 
 $loop = Factory::create();
-
-
-$port = getenv('PORT') ?: 8080;
-
-error_log("Starting WebSocket server...");
-
-$webSock = new Server("0.0.0.0:{$port}", $loop);
+$webSock = new Server('0.0.0.0:8080', $loop);
 
 $webServer = new IoServer(
     new HttpServer(
@@ -115,6 +110,5 @@ $webServer = new IoServer(
     $webSock,
     $loop
 );
-
-error_log("WebSocket server is running on ws://0.0.0.0:{$port}/");
+echo "WebSocket server is running on ws://localhost:8080/\n";
 $loop->run();
