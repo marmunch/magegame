@@ -1,5 +1,5 @@
 <?php
-require 'db.php'; // Подключаем ваш файл подключения к базе данных
+require 'db.php'; 
 
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
@@ -26,6 +26,6 @@ function check_cards_chosen($conn, $room_id) {
 $room_id = $_GET['room_id'];
 while (true) {
     check_cards_chosen($conn, $room_id);
-    sleep(5); // Увеличьте задержку, если это необходимо
+    sleep(5); 
 }
 ?>
