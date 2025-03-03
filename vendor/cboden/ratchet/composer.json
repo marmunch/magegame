@@ -26,6 +26,7 @@
         }
     }
   , "require": {
+    "cboden/ratchet": "^0.4",
         "php": ">=5.4.2"
       , "ratchet/rfc6455": "^0.3.1"
       , "react/socket": "^1.0 || ^0.8 || ^0.7 || ^0.6 || ^0.5"

@@ -10,9 +10,31 @@ document.addEventListener('DOMContentLoaded', function() {
     const yesBtn = document.querySelector('.yes');
     const noBtn = document.querySelector('.no');
     const inviterElement = document.querySelector('.inviter');
-
+    const myNameElement = document.getElementById('myname');
+    const leaveElement = document.getElementById('leave');
   
     inviteBox.style.display = 'none';
+
+    fetch('get_user_login.php')
+        .then(response => response.json())
+        .then(data => {
+            myNameElement.textContent = data.login;
+        })
+        .catch(error => console.error('Error fetching user login:', error));
+
+        leaveElement.addEventListener('click', function() {
+           
+            fetch('logout.php')
+                .then(response => {
+                    if (response.ok) {
+                        
+                        window.location.href = 'login.html';
+                    } else {
+                        console.error('Error logging out');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
 
     charIcons.forEach(icon => {
         icon.addEventListener('click', function() {
@@ -76,14 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     roomsContainer.appendChild(roomDiv);
                 }
             });
-
+    
             document.querySelectorAll('.come_in').forEach(button => {
                 button.addEventListener('click', function() {
                     const roomId = this.getAttribute('data-room-id');
                     fetch(`check_player_in_room.php?room_id=${roomId}`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.player_count < 2 && !data.is_player_in_room) {
+                        if (data.player_count < 2) {
                             fetch('join_room.php', {
                                 method: 'POST',
                                 headers: {
@@ -93,15 +115,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             })
                             .then(response => response.json())
                             .then(data => {
-                                if (data.success) {
+                                if (data.success || data.is_player_in_room) {
                                     window.location.href = `wait.html?room_id=${roomId}`;
                                 } else {
                                     alert('Ошибка при входе в комнату: ' + data.message);
                                 }
                             })
                             .catch(error => console.error('Error:', error));
-                        } else if (data.is_player_in_room) {
-                            alert('Вы уже находитесь в этой комнате.');
                         } else {
                             alert('Комната уже заполнена.');
                         }
@@ -112,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Error:', error));
     }
+    
 
     function checkInvitations() {
         fetch('check_invitations.php')

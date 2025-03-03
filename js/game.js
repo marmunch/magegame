@@ -25,52 +25,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let myLogin;
     let checkPlayersReady = true;
 
-    const socket = new WebSocket('');
+   
+    const POLLING_INTERVAL = 4000;
 
-
-    socket.onopen = function(event) {
-        console.log('WebSocket is open now.');
-        loadGameInfo();
-        updateCardsInHand();
-    };
-
-    socket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        console.log('Received message:', data);
-        if (data.type === 'timer') {
-            updateTimer(data.timeLeft);
-        } else if (data.type === 'gameInfo') {
-            loadGameInfo(data);
-        } else if (data.type === 'startPhase2') {
-            console.log('Received startPhase2 message');
-            setTimeout(() => {
-                startPhase2();
-            }, 2000);
-        } else if (data.type === 'checkPlayersReady') {
-            allPlayersReady = data.allPlayersReady;
-            if (allPlayersReady && phase === 1) {
-                phase = 2;
-                startPhase2();
-            }
-        } else if (data.type === 'checkPhase2') {
-            console.log('Received checkPhase2 message');
-            checkPhase2(data.room_id);
-        } else if (data.type === 'playerReady') {
-            console.log(`Player ${data.login} is ready`);
-            checkPhase2(room_id);
-        }
-    };
-
-    socket.onclose = function(event) {
-        console.log('WebSocket is closed now.');
-        console.log('Close event code: ', event.code);
-        console.log('Close event reason: ', event.reason);
-    };
-
-    socket.onerror = function(error) {
-        console.error('WebSocket error: ', error);
-        console.log('Checking if the server is running...');
-    };
+    
+    function startPolling() {
+        setInterval(() => {
+            loadGameInfo();
+        }, POLLING_INTERVAL);
+    }
 
     burgerMenu.addEventListener('click', function() {
         burgerMenu.classList.toggle('active');
@@ -337,12 +300,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     allCardsSelected = Object.values(selectedCards).every(card => card !== null);
                     if (allPlayersReady && allCardsSelected && phase === 1) {
                         phase = 2;
-                        console.log('Sending startPhase2 message via WebSocket');
-                        socket.send(JSON.stringify({ type: 'startPhase2', room_id: room_id }));
+                        console.log('Starting phase 2...');
+                        startPhase2();
                     } else {
                         loadGameInfo();
                     }
-                    socket.send(JSON.stringify({ type: 'playerReady', room_id: room_id, login: myLogin }));
                 } else {
                     alert('Ошибка при выполнении хода: ' + data.message);
                 }
@@ -704,7 +666,6 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const data = JSON.parse(text);
                 if (data.success) {
-
                     myCardsContainer.innerHTML = '';
                     if (data.cards && data.cards.length > 0) {
                         data.cards.forEach(card => {
@@ -722,6 +683,19 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                             myCardsContainer.appendChild(cardElement);
                         });
+    
+                        // Проверка количества карт
+                        if (data.cards.length === 5) {
+                            playButton.disabled = false;
+                            playButton.textContent = 'Сыграть';
+                            playButton.style.backgroundColor = '#51E03F';
+                            playButton.style.cursor = 'pointer';
+                        } else {
+                            playButton.disabled = true;
+                            playButton.textContent = 'Ожидание';
+                            playButton.style.backgroundColor = '#ccc';
+                            playButton.style.cursor = 'default';
+                        }
                     } else {
                         console.error('No cards found for the player.');
                     }
@@ -734,6 +708,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .catch(error => console.error('Ошибка:', error));
     }
+    
+    
+    setInterval(updateCardsInHand, 4000);
+    
 
     function resetCardsChosen() {
         fetch(`reset_cards_chosen.php?room_id=${room_id}`)
@@ -781,12 +759,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     window.addEventListener('load', function() {
         fetchCurrentTime();
-    });
-
-    socket.addEventListener('message', function(event) {
-        const data = JSON.parse(event.data);
-        if (data.type === 'startPhase2') {
-            updateCurrentTime();
-        }
+        startPolling();
     });
 });

@@ -12,9 +12,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     try {
+        
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM Players WHERE login = :login AND id_game = :id_game");
+        $stmt->bindParam(':login', $login);
+        $stmt->bindParam(':id_game', $room_id);
+        $stmt->execute();
+        $count = $stmt->fetchColumn();
+
+        if ($count > 0) {
+            
+            echo json_encode(['success' => true]);
+            exit;
+        }
+
         $conn->beginTransaction();
 
-       
+        
         $stmt = $conn->prepare("INSERT INTO Players (login, id_game) VALUES (:login, :id_game)");
         $stmt->bindParam(':login', $login);
         $stmt->bindParam(':id_game', $room_id);

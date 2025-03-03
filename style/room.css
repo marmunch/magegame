@@ -99,6 +99,18 @@ body{
     background-color: #286E1F;
 }
 
+#leave{
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    font-size: xx-large;
+   cursor: pointer;
+}
+
+#leave:hover{
+    color: #E42828;
+}
+
 .choose-char{
     margin: 0px 100px;
     max-width: 70vh;
@@ -112,6 +124,10 @@ body{
 
 .title{
     margin-bottom: 2.3vh;
+}
+
+#myname{
+    color: #FFE629;
 }
 
 .choose{

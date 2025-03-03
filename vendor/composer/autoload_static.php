@@ -17,6 +17,7 @@ class ComposerStaticInit65c9a8f87141c77ac44bfffa60df8163
     public static $prefixLengthsPsr4 = array (
         'W' => 
         array (
+            'Workerman\\' => 10,
             'WebSocket\\' => 10,
         ),
         'S' => 
@@ -41,6 +42,8 @@ class ComposerStaticInit65c9a8f87141c77ac44bfffa60df8163
         array (
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Phrity\\Util\\' => 12,
+            'Phrity\\Net\\' => 11,
         ),
         'G' => 
         array (
@@ -53,6 +56,10 @@ class ComposerStaticInit65c9a8f87141c77ac44bfffa60df8163
     );
 
     public static $prefixDirsPsr4 = array (
+        'Workerman\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/workerman/workerman',
+        ),
         'WebSocket\\' => 
         array (
             0 => __DIR__ . '/..' . '/textalk/websocket/lib',
@@ -113,6 +120,14 @@ class ComposerStaticInit65c9a8f87141c77ac44bfffa60df8163
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Phrity\\Util\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phrity/util-errorhandler/src',
+        ),
+        'Phrity\\Net\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phrity/net-uri/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
